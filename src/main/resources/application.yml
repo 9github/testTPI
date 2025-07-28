@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: urlshorterner
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  datasource:
+    url: "jdbc:postgresql://localhost:5432/shorturldb"
+    username: myuser
+    password: mypassword
+  liquibase:
+    change-log: classpath:db/changelog/changelog-master.yaml
+    enabled: true
