@@ -27,9 +27,12 @@ public class Url {
   @EqualsAndHashCode.Include
   private String id;
 
-  @Column(name = "long_url", length = 1000)
-  private String longUrl;
+  @Column(name = "alias")
+  private String alias;
 
-  @Column(name = "short_url", length = 10)
+  @Column(name = "full_url")
+  private String fullUrl;
+
+  @Column(name = "short_url")
   private String shortUrl;
 }

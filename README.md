@@ -11,3 +11,8 @@ exit
 
 ./gradlew clean build
 
+
+
+## Useful commands
+### remove docker container with docker volumes
+docker-compose down -v

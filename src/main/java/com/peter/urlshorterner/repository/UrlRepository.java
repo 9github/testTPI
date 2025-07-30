@@ -6,11 +6,11 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository
-@Transactional(readOnly = true)
+@Transactional
 public interface UrlRepository extends JpaRepository<Url, String> {
 
-  Url findByLongUrl(String longUrl);
-
-  boolean existsByLongUrl(String longUrl);
-  boolean existsByShortUrl(String shortUrl);
+  Url findByAlias(String alias);
+  boolean existsByFullUrl(String fullUrl);
+  boolean existsByAlias(String alias);
+  boolean deleteByAlias(String alias);
 }

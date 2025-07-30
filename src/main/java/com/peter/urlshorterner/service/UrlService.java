@@ -1,58 +1,86 @@
 package com.peter.urlshorterner.service;
 
+import static java.lang.String.format;
+
+import com.peter.urlshorterner.dto.UrlDto;
+import com.peter.urlshorterner.dto.UrlRequestDto;
 import com.peter.urlshorterner.entity.Url;
+import com.peter.urlshorterner.mapper.UrlMapper;
 import com.peter.urlshorterner.repository.UrlRepository;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@AllArgsConstructor
 public class UrlService {
 
   private final UrlRepository repo;
+  private final UrlMapper mapper;
 
-  public UrlService(UrlRepository repo) {
-    this.repo = repo;
+  public UrlDto shortenUrl(UrlRequestDto request) {
+    if (request == null || request.getFullUrl() == null || request.getFullUrl().isBlank()) {
+
+      return null;
+    }
+
+    if (repo.existsByFullUrl(request.getFullUrl())) {
+
+      return null;
+    }
+    // use provided alias
+    String alias;
+    if (request.getCustomAlias() != null && !request.getCustomAlias().isBlank()) {
+      alias = request.getCustomAlias();
+      if (repo.existsByAlias(alias)) {
+
+        return null;
+      }
+
+      return createAndSaveUrl(request, alias);
+    }
+    // create alias
+    alias = createAlias();
+
+    return createAndSaveUrl(request, alias);
   }
 
-  public Url shortenUrl(String longUrl) {
-    Url url = null;
-    if (repo.existsByLongUrl(longUrl)) {
-      throw new RuntimeException("Url already exists");
-    } else {
-      for (int length = 8; length <= 32; length++) {
-        for (int i = 0; i < 100; i++) {
-          String shortUrl = getShortUrl(longUrl, length);
-          if (!repo.existsByShortUrl(shortUrl)) {
-            url = Url.builder().longUrl(shortUrl).shortUrl(shortUrl).build();
-            break;
-          }
-        }
-        if (url != null) {
-          break;
+  private String createAlias() {
+    String alias;
+    for (int length = 8; length <= 32; length++) {
+      for (int i = 0; i < 100; i++) {
+        alias = UUID.randomUUID().toString().replace("-", "").substring(0, length);
+        if (!repo.existsByAlias(alias)) {
+
+          return alias;
         }
       }
     }
-    if (url == null) {
-      throw new RuntimeException("No available option of short URL.");
-    }
-    return repo.save(url);
+    throw new RuntimeException("No available option of short URL.");
   }
 
-  private String getShortUrl(String longUrl, int shortUrlLength) {
-    // TODO: ensure not infinite loop
-    if (longUrl.length() <= shortUrlLength) {
-      return longUrl;
-    }
-    return UUID.randomUUID().toString().replace("-", "").substring(0, 8);
+  private UrlDto createAndSaveUrl(UrlRequestDto request, String alias) {
+    Url url =
+        repo.save(
+            Url.builder()
+                .alias(alias)
+                .fullUrl(request.getFullUrl())
+                .shortUrl(format("https://%s", alias))
+                .build());
+
+    return mapper.toDto(url);
   }
 
-  public List<Url> getUrls() {
-    return repo.findAll();
+  public List<UrlDto> getUrls() {
+    return repo.findAll().stream().map(mapper::toDto).toList();
   }
 
-  public Optional<Url> getUrl(String id) {
-    return repo.findById(id);
+  public Url getUrlByAlias(String alias) {
+    return repo.findByAlias(alias);
+  }
+
+  public boolean deleteUrlByAlias(String alias) {
+    return repo.deleteByAlias(alias);
   }
 }
