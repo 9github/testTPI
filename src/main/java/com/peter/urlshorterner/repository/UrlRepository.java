@@ -12,5 +12,5 @@ public interface UrlRepository extends JpaRepository<Url, String> {
   Url findByAlias(String alias);
   boolean existsByFullUrl(String fullUrl);
   boolean existsByAlias(String alias);
-  boolean deleteByAlias(String alias);
+  long deleteByAlias(String alias);
 }

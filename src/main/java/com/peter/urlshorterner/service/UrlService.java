@@ -81,6 +81,6 @@ public class UrlService {
   }
 
   public boolean deleteUrlByAlias(String alias) {
-    return repo.deleteByAlias(alias);
+    return repo.deleteByAlias(alias) > 0;
   }
 }
