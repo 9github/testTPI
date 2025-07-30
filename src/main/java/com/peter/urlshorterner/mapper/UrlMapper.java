@@ -5,7 +5,7 @@ import com.peter.urlshorterner.entity.Url;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface UrlMapper {
 
   @Mapping(target = "id", ignore = true)

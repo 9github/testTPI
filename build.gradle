@@ -38,6 +38,12 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.zonky.test:embedded-database-spring-test:2.6.0'
     testImplementation 'io.zonky.test:embedded-postgres:2.1.0'
+    // snapshots
+    testImplementation 'io.github.origin-energy:java-snapshot-testing-junit5:4.0.8'
+    testImplementation 'io.github.origin-energy:java-snapshot-testing-plugin-jackson:4.0.8'
+    testImplementation 'com.fasterxml.jackson.core:jackson-core:2.19.2'
+    testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.19.2'
+
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 

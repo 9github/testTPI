@@ -21,11 +21,13 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
 @AutoConfigureEmbeddedDatabase(provider = ZONKY)
+@ActiveProfiles("test")
 @TestInstance(Lifecycle.PER_CLASS)
 public class UrlServiceTest {
 

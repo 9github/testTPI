@@ -1,0 +1,9 @@
+com.peter.urlshorterner.controller.UrlControllerTest.getUrls=[
+  [
+    {
+      "alias": "alias",
+      "fullUrl": "fullUrl",
+      "shortUrl": "shortUrl"
+    }
+  ]
+]
