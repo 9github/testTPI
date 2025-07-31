@@ -19,6 +19,9 @@ spring:
   liquibase:
     change-log: classpath:db/changelog/changelog-master.yaml
     enabled: true
+  docker:
+    compose:
+      enabled: false
 
 shorten:
   url:
