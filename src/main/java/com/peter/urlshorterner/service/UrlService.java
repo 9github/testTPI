@@ -10,15 +10,22 @@ import com.peter.urlshorterner.mapper.UrlMapper;
 import com.peter.urlshorterner.repository.UrlRepository;
 import java.util.List;
 import java.util.UUID;
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
 public class UrlService {
 
   private final UrlRepository repo;
   private final UrlMapper mapper;
+  private final String domain;
+
+  public UrlService(
+      UrlRepository repo, UrlMapper mapper, @Value("${shorten.url.domain}") String domain) {
+    this.repo = repo;
+    this.mapper = mapper;
+    this.domain = domain;
+  }
 
   public UrlResponseDto shortenUrl(UrlRequestDto request) {
     if (request == null || request.getFullUrl() == null || request.getFullUrl().isBlank()) {
@@ -67,7 +74,7 @@ public class UrlService {
             Url.builder()
                 .alias(alias)
                 .fullUrl(request.getFullUrl())
-                .shortUrl(format("https://%s", alias))
+                .shortUrl(format("https://%s/%s", domain, alias))
                 .build());
 
     return mapper.toUrlResponseDto(url);

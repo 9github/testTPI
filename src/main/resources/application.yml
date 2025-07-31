@@ -19,3 +19,7 @@ spring:
   liquibase:
     change-log: classpath:db/changelog/changelog-master.yaml
     enabled: true
+
+shorten:
+  url:
+    domain: localhost:8080

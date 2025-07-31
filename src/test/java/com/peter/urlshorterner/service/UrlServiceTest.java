@@ -21,6 +21,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -34,12 +35,13 @@ public class UrlServiceTest {
 
   @Autowired UrlRepository urlRepository;
   UrlMapper urlMapper = new UrlMapperImpl();
+  @Value( "${shorten.url.domain}" ) private String domain;
 
   private UrlService service;
 
   @BeforeAll
   void setUpService() {
-    service = new UrlService(urlRepository, urlMapper);
+    service = new UrlService(urlRepository, urlMapper, domain);
   }
 
   @BeforeEach
@@ -53,12 +55,12 @@ public class UrlServiceTest {
     final String ALIAS = "alias2";
     UrlRequestDto request = UrlRequestDto.builder().fullUrl("fullUrl2").customAlias(ALIAS).build();
     var urlResponseDto = service.shortenUrl(request);
-    assertEquals("https://alias2", urlResponseDto.getShortUrl());
+    assertEquals("https://localhost:8080/alias2", urlResponseDto.getShortUrl());
 
     var url = urlRepository.findByAlias(ALIAS);
     assertEquals("alias2", url.getAlias());
     assertEquals("fullUrl2", url.getFullUrl());
-    assertEquals("https://alias2", url.getShortUrl());
+    assertEquals("https://localhost:8080/alias2", url.getShortUrl());
   }
 
   @Test
@@ -73,7 +75,7 @@ public class UrlServiceTest {
             .findFirst()
             .get();
     assertTrue(Strings.isNotEmpty(url.getAlias()));
-    assertEquals(format("https://%s", url.getAlias()), url.getShortUrl());
+    assertEquals(format("https://localhost:8080/%s", url.getAlias()), url.getShortUrl());
     assertEquals("fullUrl2", url.getFullUrl());
   }
 
