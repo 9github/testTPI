@@ -9,6 +9,7 @@ import com.peter.urlshorterner.entity.Url;
 import com.peter.urlshorterner.mapper.UrlMapper;
 import com.peter.urlshorterner.repository.UrlRepository;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,8 @@ public class UrlService {
   private final UrlRepository repo;
   private final UrlMapper mapper;
   private final String domain;
+  //TODO add check for forbidden aliases (equal to reserved urls)
+  private final Set<String> forbiddenAliases = Set.of("urls", "shorten");
 
   public UrlService(
       UrlRepository repo, UrlMapper mapper, @Value("${shorten.url.domain}") String domain) {
