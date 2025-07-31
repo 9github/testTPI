@@ -7,3 +7,10 @@ com.peter.urlshorterner.controller.UrlControllerTest.getUrls=[
     }
   ]
 ]
+
+
+com.peter.urlshorterner.controller.UrlControllerTest.shortenUrlWithProvidedAlias=[
+  {
+    "shortUrl": "https://localhost:8080/alias2"
+  }
+]
