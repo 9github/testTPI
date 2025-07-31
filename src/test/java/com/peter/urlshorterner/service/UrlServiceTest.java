@@ -13,6 +13,7 @@ import com.peter.urlshorterner.mapper.UrlMapper;
 import com.peter.urlshorterner.mapper.UrlMapperImpl;
 import com.peter.urlshorterner.repository.UrlRepository;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
+import org.apache.logging.log4j.util.Strings;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,23 +50,31 @@ public class UrlServiceTest {
 
   @Test
   void shortenUrlWithProvidedAlias() {
-    UrlRequestDto request =
-        UrlRequestDto.builder().fullUrl("fullUrl2").customAlias("alias2").build();
-    var urlDto = service.shortenUrl(request);
-    assertEquals("alias2", urlDto.getAlias());
-    assertEquals("fullUrl2", urlDto.getFullUrl());
-    assertEquals("https://alias2", urlDto.getShortUrl());
-    assertTrue(urlRepository.existsByAlias("alias2"));
+    final String ALIAS = "alias2";
+    UrlRequestDto request = UrlRequestDto.builder().fullUrl("fullUrl2").customAlias(ALIAS).build();
+    var urlResponseDto = service.shortenUrl(request);
+    assertEquals("https://alias2", urlResponseDto.getShortUrl());
+
+    var url = urlRepository.findByAlias(ALIAS);
+    assertEquals("alias2", url.getAlias());
+    assertEquals("fullUrl2", url.getFullUrl());
+    assertEquals("https://alias2", url.getShortUrl());
   }
 
   @Test
   void shortenUrlWithGeneratedAlias() {
     UrlRequestDto request = UrlRequestDto.builder().fullUrl("fullUrl2").build();
-    var urlDto = service.shortenUrl(request);
-    assertEquals(8, urlDto.getAlias().length());
-    assertEquals("fullUrl2", urlDto.getFullUrl());
-    assertEquals(format("https://%s", urlDto.getAlias()), urlDto.getShortUrl());
-    assertTrue(urlRepository.existsByAlias(urlDto.getAlias()));
+    var urlResponseDto = service.shortenUrl(request);
+    assertTrue(Strings.isNotEmpty(urlResponseDto.getShortUrl()));
+
+    Url url =
+        urlRepository.findAll().stream()
+            .filter(it -> it.getFullUrl().equals("fullUrl2"))
+            .findFirst()
+            .get();
+    assertTrue(Strings.isNotEmpty(url.getAlias()));
+    assertEquals(format("https://%s", url.getAlias()), url.getShortUrl());
+    assertEquals("fullUrl2", url.getFullUrl());
   }
 
   @Test
@@ -74,12 +83,14 @@ public class UrlServiceTest {
     assertNull(service.shortenUrl(request));
     UrlRequestDto request2 = UrlRequestDto.builder().fullUrl(" ").build();
     assertNull(service.shortenUrl(request2));
+    assertEquals(1, urlRepository.count());
   }
 
   @Test
   void returnNullIfExistingFullUrlProvided() {
     UrlRequestDto request = UrlRequestDto.builder().fullUrl("fullUrl").build();
     assertNull(service.shortenUrl(request));
+    assertEquals(1, urlRepository.count());
   }
 
   @Test
@@ -87,6 +98,7 @@ public class UrlServiceTest {
     UrlRequestDto request =
         UrlRequestDto.builder().fullUrl("fullUrl2").customAlias("alias").build();
     assertNull(service.shortenUrl(request));
+    assertEquals(1, urlRepository.count());
   }
 
   @Test

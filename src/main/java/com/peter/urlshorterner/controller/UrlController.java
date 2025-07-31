@@ -2,6 +2,7 @@ package com.peter.urlshorterner.controller;
 
 import com.peter.urlshorterner.dto.UrlDto;
 import com.peter.urlshorterner.dto.UrlRequestDto;
+import com.peter.urlshorterner.dto.UrlResponseDto;
 import com.peter.urlshorterner.entity.Url;
 import com.peter.urlshorterner.service.UrlService;
 import java.net.URI;
@@ -25,12 +26,10 @@ public class UrlController {
   private final UrlService service;
 
   @PostMapping("/shorten")
-  public ResponseEntity<String> shortenUrl(@RequestBody UrlRequestDto request) {
+  public ResponseEntity<UrlResponseDto> shortenUrl(@RequestBody UrlRequestDto request) {
     // exclude "shorten", "urls"
-    UrlDto urlDto = service.shortenUrl(request);
-    String response;
-    if (urlDto != null) {
-      response = urlDto.getShortUrl();
+    UrlResponseDto response = service.shortenUrl(request);
+    if (response != null) {
       return new ResponseEntity<>(response, HttpStatus.CREATED);
     } else {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

@@ -1,6 +1,7 @@
 package com.peter.urlshorterner.mapper;
 
 import com.peter.urlshorterner.dto.UrlDto;
+import com.peter.urlshorterner.dto.UrlResponseDto;
 import com.peter.urlshorterner.entity.Url;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -12,4 +13,6 @@ public interface UrlMapper {
   Url toEntity(UrlDto urlDto);
 
   UrlDto toDto(Url url);
+
+  UrlResponseDto toUrlResponseDto(Url url);
 }

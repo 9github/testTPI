@@ -4,6 +4,7 @@ import static java.lang.String.format;
 
 import com.peter.urlshorterner.dto.UrlDto;
 import com.peter.urlshorterner.dto.UrlRequestDto;
+import com.peter.urlshorterner.dto.UrlResponseDto;
 import com.peter.urlshorterner.entity.Url;
 import com.peter.urlshorterner.mapper.UrlMapper;
 import com.peter.urlshorterner.repository.UrlRepository;
@@ -19,7 +20,7 @@ public class UrlService {
   private final UrlRepository repo;
   private final UrlMapper mapper;
 
-  public UrlDto shortenUrl(UrlRequestDto request) {
+  public UrlResponseDto shortenUrl(UrlRequestDto request) {
     if (request == null || request.getFullUrl() == null || request.getFullUrl().isBlank()) {
 
       return null;
@@ -60,7 +61,7 @@ public class UrlService {
     throw new RuntimeException("No available option of short URL.");
   }
 
-  private UrlDto createAndSaveUrl(UrlRequestDto request, String alias) {
+  private UrlResponseDto createAndSaveUrl(UrlRequestDto request, String alias) {
     Url url =
         repo.save(
             Url.builder()
@@ -69,7 +70,7 @@ public class UrlService {
                 .shortUrl(format("https://%s", alias))
                 .build());
 
-    return mapper.toDto(url);
+    return mapper.toUrlResponseDto(url);
   }
 
   public List<UrlDto> getUrls() {

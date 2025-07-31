@@ -1,16 +1,22 @@
 package com.peter.urlshorterner.controller;
 
 import static com.peter.urlshorterner.util.TestUtil.getBodyAsListOf;
+import static com.peter.urlshorterner.util.TestUtil.getBodyAsObjectOf;
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.DatabaseProvider.ZONKY;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import au.com.origin.snapshots.Expect;
 import au.com.origin.snapshots.junit5.SnapshotExtension;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.peter.urlshorterner.dto.UrlDto;
+import com.peter.urlshorterner.dto.UrlRequestDto;
+import com.peter.urlshorterner.dto.UrlResponseDto;
 import com.peter.urlshorterner.entity.Url;
 import com.peter.urlshorterner.repository.UrlRepository;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
@@ -31,7 +37,8 @@ import org.springframework.test.web.servlet.MockMvc;
 public class UrlControllerTest {
 
   @Autowired private MockMvc mockMvc;
-  @Autowired UrlRepository urlRepository;
+  @Autowired private UrlRepository urlRepository;
+  @Autowired private ObjectMapper objectMapper;
   private Expect expect;
 
   @BeforeEach
@@ -47,6 +54,49 @@ public class UrlControllerTest {
 
   final UrlDto urlDto =
       UrlDto.builder().alias("alias").fullUrl("fullUrl").shortUrl("shortUrl").build();
+
+  @Test
+  void shortenUrlWithProvidedAlias() throws Exception {
+    UrlRequestDto requestDto =
+        UrlRequestDto.builder().fullUrl("https://fullUrl2").customAlias("alias2").build();
+    String request = objectMapper.writeValueAsString(requestDto);
+
+    var body =
+        getBodyAsObjectOf(
+            UrlDto.class,
+            mockMvc
+                .perform(post("/shorten")
+                .content(request)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(201))
+                .andReturn()
+                .getResponse()
+                .getContentAsString());
+
+    expect.serializer("json").toMatchSnapshot(body);
+  }
+
+  @Test
+  void shortenUrlWithGeneratedAlias() throws Exception {
+    UrlRequestDto requestDto =
+        UrlRequestDto.builder().fullUrl("https://fullUrl2").build();
+    String request = objectMapper.writeValueAsString(requestDto);
+
+    var body =
+        getBodyAsObjectOf(
+            UrlResponseDto.class,
+            mockMvc
+                .perform(post("/shorten")
+                    .content(request)
+                    .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is(201))
+                .andReturn()
+                .getResponse()
+                .getContentAsString());
+
+
+    assertTrue(body.getShortUrl().startsWith("https://"));
+  }
 
   @Test
   void getUrls() throws Exception {
