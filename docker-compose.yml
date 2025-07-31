@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  spring_app:
+    build: . # Build the Spring app image from the current directory (where Dockerfile is)
+    ports:
+      - "8080:8080" # Map host port 8080 to container port 8080
+    environment:
+      # These environment variables override values in application.yml/properties
+      # for the database connection.
+      # The host for the database is 'postgres_db' (the service name of the DB container)
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_db:5432/shorturldb
+      SPRING_DATASOURCE_USERNAME: myuser
+      SPRING_DATASOURCE_PASSWORD: mypassword # TODO move to the env var for security
+    depends_on:
+      - postgres_db # Ensures postgres_db starts before spring_app
+    networks:
+      - app_network # Connects spring_app to 'app_network'
+
+  postgres_db:
+    image: postgres:15 # Use a specific PostgreSQL version for stability
+    environment:
+      POSTGRES_DB: shorturldb     # Database name
+      POSTGRES_USER: myuser       # Database user
+      POSTGRES_PASSWORD: mypassword # Database password - TODO move to the env var for security
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Persist database data
+    ports:
+      - "5432:5432" # Optional: Expose PostgreSQL port to host for external access (e.g., DBeaver)
+    networks:
+      - app_network # Connects postgres_db to 'app_network'
+
+volumes:
+  postgres_data: # Define a named volume for PostgreSQL data persistence
+
+networks:
+  app_network: # Define a custom bridge network for services to communicate
+    driver: bridge
