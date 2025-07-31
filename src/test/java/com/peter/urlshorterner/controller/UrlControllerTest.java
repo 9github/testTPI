@@ -66,9 +66,17 @@ public class UrlControllerTest {
   @Test
   void getUrlByAlias() throws Exception {
     mockMvc
-        .perform(get("/alias").contentType(MediaType.APPLICATION_JSON))
+        .perform(get("/alias"))
         .andExpect(status().is(302))
         .andExpect(header().string("location", "fullUrl"))
+        .andReturn();
+  }
+
+  @Test
+  void getUrlByAliasNoUrl() throws Exception {
+    mockMvc
+        .perform(get("/alias2"))
+        .andExpect(status().is(404))
         .andReturn();
   }
 
@@ -76,10 +84,19 @@ public class UrlControllerTest {
   void deleteUrlByAlias() throws Exception {
     final String ALIAS = "alias";
     mockMvc
-        .perform(delete("/" + ALIAS).contentType(MediaType.APPLICATION_JSON))
+        .perform(delete("/" + ALIAS))
         .andExpect(status().is(204))
         .andReturn();
 
     assertFalse(urlRepository.existsByAlias(ALIAS));
+  }
+
+  @Test
+  void deleteUrlByAliasNoUrl() throws Exception {
+    final String ALIAS = "alias2";
+    mockMvc
+        .perform(delete("/" + ALIAS))
+        .andExpect(status().is(404))
+        .andReturn();
   }
 }
